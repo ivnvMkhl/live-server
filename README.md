@@ -2,6 +2,10 @@
 
 CLI server for serve static files in folder
 
+## Download
+
+[Binary](https://github.com/ivnvMkhl/live-server/tree/master/build)
+
 ## Usage
 
 Recomanded use the alias on you terminal, `.zshrc` for example
