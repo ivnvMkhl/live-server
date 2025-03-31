@@ -28,12 +28,16 @@ for help use `-h` flag
 server -h
 
 # Output: Usage of /live-server:
+#  -log
+#    	Logging all requests
 #  -p string
-#    	Port to run the server on (shorthand) (default "8080")
+#    	Port to run the server on. Default: 8080 (shorthand) (default "8080")
 #  -port string
-#    	Port to run the server on (default "8080")
+#    	Port to run the server on. Default: 8080 (default "8080")
 #  -spa
-#    	Use server for SPA. Server redirects any request to the ./index.html
+#    	Use server for SPA. Server any route request returned ./index.html
+#  -spa-entry string
+#    	Path to SPA entry file. Default: /index.html (default "/index.html")
 #  -src string
 #    	Relative path to files
 ```
