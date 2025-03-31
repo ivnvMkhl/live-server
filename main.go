@@ -79,10 +79,10 @@ func init() {
 	flag.StringVar(&spaEntry, "spa-entry", spaEntryDefault, spaEntryUsage)
 	flag.BoolVar(&spa, "spa", spaDefault, spaUsage)
 	flag.BoolVar(&logEnabled, "log", logEnabledDefault, logEnabledUsage)
-	flag.Parse()
 }
 
 func main() {
+	flag.Parse()
 	currentDir, err := os.Getwd()
 	if err != nil {
 		log.Fatal("Error getting current directory:", err)
