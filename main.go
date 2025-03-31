@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"regexp"
 	"time"
 )
 
@@ -36,11 +37,19 @@ func main() {
 	filesPath := currentDir + "/" + src
 	if spa {
 		http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-			f, err := os.Open(filesPath + "/index.html")
-			if err != nil {
-				http.Error(w, "not found index.html", http.StatusNotFound)
+			regex, _ := regexp.Compile(`[/a-zA-Z]*[.][a-zA-z]+`)
+			isStaticFile := regex.MatchString(r.URL.String())
+			var relativePath string
+			if isStaticFile {
+				relativePath = r.URL.String()
 			} else {
-				http.ServeContent(w, r, "index.html", time.Now(), f)
+				relativePath = "/index.html"
+			}
+			f, err := os.Open(filesPath + relativePath)
+			if err != nil {
+				http.Error(w, "not found "+relativePath, http.StatusNotFound)
+			} else {
+				http.ServeContent(w, r, relativePath, time.Now(), f)
 			}
 		})
 	} else {
