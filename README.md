@@ -31,9 +31,9 @@ server -h
 #  -log
 #    	Logging all requests
 #  -p string
-#    	Port to run the server on. Default: 8080 (shorthand) (default "8080")
+#    	Server startup port (shorthand) (default "8080")
 #  -port string
-#    	Port to run the server on. Default: 8080 (default "8080")
+#    	Server startup port (default "8080")
 #  -spa
 #    	Use server for SPA. Server any route request returned ./index.html
 #  -spa-entry string

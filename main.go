@@ -20,9 +20,9 @@ var (
 
 const (
 	spaEntryDefault   = "/index.html"
-	spaEntryUsage     = "Path to SPA entry file. Default: /index.html"
+	spaEntryUsage     = "Path to SPA entry file"
 	portDefault       = "8080"
-	portUsage         = "Port to run the server on. Default: 8080"
+	portUsage         = "Server startup port"
 	srcDefault        = ""
 	srcUsage          = "Relative path to files"
 	spaDefault        = false
