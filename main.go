@@ -9,6 +9,14 @@ import (
 	"time"
 )
 
+const fileMatchRegexStr string = `^\/(.*\/)?.*\.[a-zA-Z0-9?_-]+$`
+
+var fileMatchRegexp regexp.Regexp = *regexp.MustCompile(fileMatchRegexStr)
+
+func checkFileUrl(url string) bool {
+	return fileMatchRegexp.MatchString(url)
+}
+
 func main() {
 	var (
 		port string
@@ -37,11 +45,12 @@ func main() {
 	filesPath := currentDir + "/" + src
 	if spa {
 		http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-			regex, _ := regexp.Compile(`[/a-zA-Z]*[.][a-zA-z]+`)
-			isStaticFile := regex.MatchString(r.URL.String())
+			url := r.URL.String()
+			isStaticFile := checkFileUrl(url)
+			log.Println(url, isStaticFile)
 			var relativePath string
 			if isStaticFile {
-				relativePath = r.URL.String()
+				relativePath = url
 			} else {
 				relativePath = "/index.html"
 			}
