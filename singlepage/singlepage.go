@@ -1,11 +1,11 @@
 package singlepage
 
 import (
-	"ivnvMkhl/live-server/logger"
+	"live-server/logger"
+	"live-server/watcher"
 	"net/http"
 	"os"
 	"regexp"
-	"time"
 )
 
 type httpHandleFunc func(w http.ResponseWriter, r *http.Request)
@@ -18,7 +18,7 @@ func checkFileUrl(url string) bool {
 	return fileMatchRegexp.MatchString(url)
 }
 
-func Handler(basePath string, spaEntry string, logEnabled bool) httpHandleFunc {
+func Handler(basePath string, spaEntry string, logEnabled bool, watch bool) httpHandleFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		url := r.URL.String()
 		isStaticFile := checkFileUrl(url)
@@ -27,13 +27,17 @@ func Handler(basePath string, spaEntry string, logEnabled bool) httpHandleFunc {
 			logger.Log(logEnabled, "REQUEST: "+url+"  RESPONSE: "+url)
 			http.FileServer(http.Dir(basePath)).ServeHTTP(w, r)
 		} else {
-			f, err := os.Open(basePath + spaEntry)
+			indexContent, err := os.ReadFile(basePath + spaEntry)
 			if err != nil {
-				logger.Log(logEnabled, "REQUEST: "+url+"  RESPONSE: [Failed] not found"+spaEntry)
+				logger.Log(logEnabled, "REQUEST: "+url+"  RESPONSE: [Failed] not found "+spaEntry)
 				http.Error(w, "not found "+spaEntry, http.StatusNotFound)
+				return
+			}
+
+			if watch {
+				w.Write(watcher.IntegrateWatchScript(indexContent))
 			} else {
-				logger.Log(logEnabled, "REQUEST: "+url+"  RESPONSE: "+spaEntry)
-				http.ServeContent(w, r, spaEntry, time.Now(), f)
+				w.Write(indexContent)
 			}
 		}
 	}

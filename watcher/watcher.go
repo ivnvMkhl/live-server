@@ -1,13 +1,26 @@
 package watcher
 
 import (
-	"ivnvMkhl/live-server/logger"
+	"bytes"
+	"live-server/assets"
+	"live-server/logger"
 	"log"
 
 	"github.com/fsnotify/fsnotify"
 )
 
 type Event = fsnotify.Event
+
+const integratedTag string = "</head>"
+
+func IntegrateWatchScript(htmlContent []byte) []byte {
+	return bytes.Replace(
+		htmlContent,
+		[]byte(integratedTag),
+		append([]byte(assets.WatchScript), []byte(integratedTag)...),
+		1,
+	)
+}
 
 func Subscribe(path string, cb func(fsnotify.Event)) (dispose func()) {
 	// Create new watcher.

@@ -41,5 +41,5 @@ server -h
 #  -src string
 #    	Relative path to files
 #  -watch
-#  	  Watch mode for listen modified files in serve path
+#  	  Watch mode for listen modified files in serve path (only on SPA mode, default false)
 ```

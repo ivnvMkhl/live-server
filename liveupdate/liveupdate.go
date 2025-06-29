@@ -2,8 +2,8 @@ package liveupdate
 
 import (
 	"fmt"
-	"ivnvMkhl/live-server/logger"
-	"ivnvMkhl/live-server/watcher"
+	"live-server/logger"
+	"live-server/watcher"
 	"net/http"
 
 	"github.com/gorilla/websocket"

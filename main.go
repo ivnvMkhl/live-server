@@ -3,9 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
-	"ivnvMkhl/live-server/liveupdate"
-	"ivnvMkhl/live-server/logger"
-	"ivnvMkhl/live-server/singlepage"
+	"live-server/liveupdate"
+	"live-server/logger"
+	"live-server/singlepage"
 	"net/http"
 	"os"
 )
@@ -31,7 +31,7 @@ const (
 	logEnabledDefault = false
 	logEnabledUsage   = "Logging all requests"
 	watchDefault      = false
-	watchUsage        = "Watch mode for listen modified files in serve path"
+	watchUsage        = "Watch mode for listen modified files in serve path (only on SPA mode, default false)"
 )
 
 const liveUpdateWSRoute string = "/ws_live_reload"
@@ -64,13 +64,12 @@ func main() {
 	}
 
 	if spa {
-		http.HandleFunc(mainRoute, singlepage.Handler(workingPath, spaEntry, logEnabled))
+		http.HandleFunc(mainRoute, singlepage.Handler(workingPath, spaEntry, logEnabled, watch))
+		if watch {
+			http.HandleFunc(liveUpdateWSRoute, liveupdate.Handler(workingPath, logEnabled))
+		}
 	} else {
 		http.Handle(mainRoute, http.FileServer(http.Dir(workingPath)))
-	}
-
-	if watch {
-		http.HandleFunc(liveUpdateWSRoute, liveupdate.Handler(workingPath, logEnabled))
 	}
 
 	logger.Log(true, fmt.Sprintf("Starting live on port: %s in path: %s", port, workingPath))

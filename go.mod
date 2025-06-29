@@ -1,4 +1,4 @@
-module ivnvMkhl/live-server
+module live-server
 
 go 1.24.1
 
