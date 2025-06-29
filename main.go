@@ -3,11 +3,11 @@ package main
 import (
 	"flag"
 	"fmt"
-	"log"
+	"live-server/liveupdate"
+	"live-server/logger"
+	"live-server/singlepage"
 	"net/http"
 	"os"
-	"regexp"
-	"time"
 )
 
 var (
@@ -16,6 +16,7 @@ var (
 	spaEntry   string
 	spa        bool
 	logEnabled bool
+	watch      bool
 )
 
 const (
@@ -29,48 +30,12 @@ const (
 	spaUsage          = "Use server for SPA. Server any route request returned ./index.html"
 	logEnabledDefault = false
 	logEnabledUsage   = "Logging all requests"
+	watchDefault      = false
+	watchUsage        = "Watch mode for listen modified files in serve path (only on SPA mode, default false)"
 )
 
-const fileMatchRegexStr string = `^\/(.*\/)?.*\.[a-zA-Z0-9?_-]+$`
-
-var fileMatchRegexp regexp.Regexp = *regexp.MustCompile(fileMatchRegexStr)
-
-func checkFileUrl(url string) bool {
-	return fileMatchRegexp.MatchString(url)
-}
-
-func logger(logRestrinction bool, logStr string) {
-	if logRestrinction {
-		t := time.Now()
-		formattedTimestamp := fmt.Sprintf("%d/%02d/%02d %02d:%02d:%02d",
-			t.Year(), t.Month(), t.Day(),
-			t.Hour(), t.Minute(), t.Second())
-		log.Println(formattedTimestamp, " ", logStr)
-	}
-}
-
-type httpHandleFunc func(w http.ResponseWriter, r *http.Request)
-
-func spaHandler(basePath string, logEnabled bool) httpHandleFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		url := r.URL.String()
-		isStaticFile := checkFileUrl(url)
-
-		if isStaticFile {
-			logger(logEnabled, "REQUEST: "+url+"  RESPONSE: "+url)
-			http.StripPrefix("/", http.FileServer(http.Dir(basePath))).ServeHTTP(w, r)
-		} else {
-			f, err := os.Open(basePath + spaEntry)
-			if err != nil {
-				logger(logEnabled, "REQUEST: "+url+"  RESPONSE: [Failed] not found"+spaEntry)
-				http.Error(w, "not found "+spaEntry, http.StatusNotFound)
-			} else {
-				logger(logEnabled, "REQUEST: "+url+"  RESPONSE: "+spaEntry)
-				http.ServeContent(w, r, spaEntry, time.Now(), f)
-			}
-		}
-	}
-}
+const liveUpdateWSRoute string = "/ws_live_reload"
+const mainRoute string = "/"
 
 func init() {
 	flag.StringVar(&port, "port", portDefault, portUsage)
@@ -79,23 +44,34 @@ func init() {
 	flag.StringVar(&spaEntry, "spa-entry", spaEntryDefault, spaEntryUsage)
 	flag.BoolVar(&spa, "spa", spaDefault, spaUsage)
 	flag.BoolVar(&logEnabled, "log", logEnabledDefault, logEnabledUsage)
+	flag.BoolVar(&watch, "watch", watchDefault, watchUsage)
+}
+
+func getWorkingPath() (err error, workingPath string) {
+	currentDir, err := os.Getwd()
+	if err != nil {
+		return err, ""
+	}
+	return nil, fmt.Sprintf("%s/%s", currentDir, src)
 }
 
 func main() {
 	flag.Parse()
-	currentDir, err := os.Getwd()
-	if err != nil {
-		log.Fatal("Error getting current directory:", err)
-	}
 
-	fullPath := fmt.Sprintf("%s/%s", currentDir, src)
+	err, workingPath := getWorkingPath()
+	if err != nil {
+		logger.Fatal("Do not get working path ", err)
+	}
 
 	if spa {
-		http.HandleFunc("/", spaHandler(fullPath, logEnabled))
+		http.HandleFunc(mainRoute, singlepage.Handler(workingPath, spaEntry, logEnabled, watch))
+		if watch {
+			http.HandleFunc(liveUpdateWSRoute, liveupdate.Handler(workingPath, logEnabled))
+		}
 	} else {
-		http.Handle("/", http.StripPrefix("/", http.FileServer(http.Dir(fullPath))))
+		http.Handle(mainRoute, http.FileServer(http.Dir(workingPath)))
 	}
 
-	log.Println("Starting live on port:", port, "in path:", fullPath, " ...")
-	http.ListenAndServe(":"+port, nil)
+	logger.Log(true, fmt.Sprintf("Starting live on port: %s in path: %s", port, workingPath))
+	http.ListenAndServe(fmt.Sprintf(":%s", port), nil)
 }

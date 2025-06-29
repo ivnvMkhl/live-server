@@ -4,7 +4,7 @@ CLI server for serve static files in folder
 
 ## Download
 
-[Binary](https://github.com/ivnvMkhl/live-server/tree/master/build)
+[Binary](https://github.com/ivnvMkhl/live-server/tree/master/build_bin)
 
 ## Usage
 
@@ -40,4 +40,6 @@ server -h
 #    	Path to SPA entry file. Default: /index.html (default "/index.html")
 #  -src string
 #    	Relative path to files
+#  -watch
+#  	  Watch mode for listen modified files in serve path (only on SPA mode, default false)
 ```
