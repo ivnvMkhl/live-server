@@ -12,6 +12,7 @@ import (
 
 var (
 	port       string
+	host       string
 	src        string
 	spaEntry   string
 	spa        bool
@@ -22,6 +23,8 @@ var (
 const (
 	spaEntryDefault   = "/index.html"
 	spaEntryUsage     = "Path to SPA entry file"
+	hostDefault       = "0.0.0.0"
+	hostUsage         = "Host address"
 	portDefault       = "8080"
 	portUsage         = "Server startup port"
 	srcDefault        = ""
@@ -40,6 +43,8 @@ const mainRoute string = "/"
 func init() {
 	flag.StringVar(&port, "port", portDefault, portUsage)
 	flag.StringVar(&port, "p", portDefault, portUsage+" (shorthand)")
+	flag.StringVar(&host, "host", hostDefault, hostUsage)
+	flag.StringVar(&host, "h", hostDefault, hostUsage+" (shorthand)")
 	flag.StringVar(&src, "src", srcDefault, srcUsage)
 	flag.StringVar(&spaEntry, "spa-entry", spaEntryDefault, spaEntryUsage)
 	flag.BoolVar(&spa, "spa", spaDefault, spaUsage)
@@ -72,6 +77,6 @@ func main() {
 		http.Handle(mainRoute, http.FileServer(http.Dir(workingPath)))
 	}
 
-	logger.Log(true, fmt.Sprintf("Starting live on port: %s in path: %s", port, workingPath))
-	http.ListenAndServe(fmt.Sprintf(":%s", port), nil)
+	logger.Log(true, fmt.Sprintf("Starting live on %s:%s in path: %s", host, port, workingPath))
+	http.ListenAndServe(fmt.Sprintf("%s:%s", host, port), nil)
 }

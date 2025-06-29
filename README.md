@@ -19,7 +19,7 @@ Base usage on current dir
 ```bash
 server
 
-# Output: Starting live on port: 8080 in path: / ...
+# Output: Starting live on 0.0.0.0:8080 in path: / ...
 ```
 
 for help use `-h` flag
@@ -28,18 +28,22 @@ for help use `-h` flag
 server -h
 
 # Output: Usage of /live-server:
-#  -log
-#    	Logging all requests
-#  -p string
-#    	Server startup port (shorthand) (default "8080")
-#  -port string
-#    	Server startup port (default "8080")
-#  -spa
-#    	Use server for SPA. Server any route request returned ./index.html
-#  -spa-entry string
-#    	Path to SPA entry file. Default: /index.html (default "/index.html")
-#  -src string
-#    	Relative path to files
-#  -watch
-#  	  Watch mode for listen modified files in serve path (only on SPA mode, default false)
+# -h string
+#   	Host address (shorthand) (default "0.0.0.0")
+# -host string
+#   	Host address (default "0.0.0.0")
+# -log
+#   	Logging all requests
+# -p string
+#   	Server startup port (shorthand) (default "8080")
+# -port string
+#   	Server startup port (default "8080")
+# -spa
+#   	Use server for SPA. Server any route request returned ./index.html
+# -spa-entry string
+#   	Path to SPA entry file (default "/index.html")
+# -src string
+#   	Relative path to files
+# -watch
+#   	Watch mode for listen modified files in serve path (only on SPA mode, default false)
 ```
